@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buscador.Controllers
 {
-    public class BuscadorController : Controller
+    public class BuscadorController : ControllerBase
     {
         private readonly IBuscadorAplication _buscadorAplication;
 
@@ -14,17 +14,23 @@ namespace Buscador.Controllers
             _buscadorAplication = buscadorAplication;
         }
 
+        /// <summary>
+        /// Realiza a pesquisa de situações com base em um critério de busca.
+        /// </summary>
         // GET: BuscadorController
-        [HttpGet("pesquisa Situacoes")]
-        public async Task<List<SituacaoDto>> BuscadorControllers(string pesquisa)
+        [HttpGet("pesquisa-situacoes")]
+        public async Task<List<SituacaoDto>> BuscarSituacoes(string pesquisa)
         {
             var response = await _buscadorAplication.BuscarSituacoesAsync(pesquisa);
             return response;
         }
 
-        // POST: HomeController/Create
-        [HttpPost("Adiciona Situacoes")]
-        public async Task<List<SituacaoDto>> CriaSituacao(CriarSituacaoDto add)
+        /// <summary>
+        /// Adiciona situações.
+        /// </summary>
+        // POST: BuscadorController/Create
+        [HttpPost("adiciona-situacoes")]
+        public async Task<List<SituacaoDto>> CriarSituacao(CriarSituacaoDto add)
         {
             var response = new List<SituacaoDto>();
             try
@@ -39,46 +45,46 @@ namespace Buscador.Controllers
             }
         }
 
-        // GET: HomeController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: HomeController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: HomeController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: HomeController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// GET: HomeController/Edit/5
+        //public ActionResult Edit(int id)
+        //{
+        //    return View();
+        //}
+        //
+        //// POST: HomeController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
+        //
+        //// GET: HomeController/Delete/5
+        //public ActionResult Delete(int id)
+        //{
+        //    return View();
+        //}
+        //
+        //// POST: HomeController/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
     }
 }
