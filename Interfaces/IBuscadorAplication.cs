@@ -1,12 +1,17 @@
 ﻿using Buscador.Dtos;
-using Buscador.Models;
+using Buscador.Dtos.Requests;
+using Buscador.Dtos.Responses;
 
 namespace Buscador.Interfaces
 {
     public interface IBuscadorAplication
     {
-        Task<List<SituacaoDto>> BuscarSituacoesAsync(string pesquisa);
+        Task<SituacaoResponse> BuscarSituacoesAsync(int id);
 
-        Task<List<SituacaoDto>> CriaSituacoesAsync(CriarSituacaoDto add);
+        Task<SituacaoResponse> CriaSituacoesAsync(CriarSituacaoRequest request);
+
+        Task<List<SituacaoResponse>> ListAllAsync(string pesquisa);
+
+        Task<bool> DeleteSituacoesAsync(int id);
     }
 }

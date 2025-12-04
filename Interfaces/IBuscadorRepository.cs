@@ -1,15 +1,22 @@
-﻿using Buscador.Dtos;
-using Buscador.Models;
+﻿using Buscador.Models;
 
 namespace Buscador.Interfaces
 {
     public interface IBuscadorRepository
     {
-        Task<List<SituacaoDto>> BuscarSituacoesRepAsync(string pesquisa);
+        Task<List<Situacao>> BuscarSituacoesAsync(string pesquisa);
 
-        Task<List<SituacaoDto>> BuscarProblemaDescricaoAsync(string pesquisa);
+        Task<Situacao> BuscarProblemaDescricaoAsync(string pesquisa);
 
-        Task AddSituacaoAsync(Situacao situacao);
+        Task<bool> ExistsAsync(int id);
+
+        Task<Situacao> GetIdAsync(int id);
+
+        Task DeleteAsync(int id);
+
+        Task<Situacao> ExisteProblemaDescricaoAsync(string pesquisa);
+
+        Task<Situacao> AddSituacaoAsync(Situacao situacao);
 
         Task<int> SaveChangesAsync();
     }

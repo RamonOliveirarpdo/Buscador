@@ -11,10 +11,14 @@ namespace Buscador.Infrastructure.Data
         }
 
         public DbSet<Situacao> Situacoes { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Situacao>()
+                .HasKey(s => s.Id);
+
+            modelBuilder.Entity<User>()
                 .HasKey(s => s.Id);
         }
     }

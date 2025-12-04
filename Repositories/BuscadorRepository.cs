@@ -1,5 +1,4 @@
-﻿using Buscador.Dtos;
-using Buscador.Infrastructure.Data;
+﻿using Buscador.Infrastructure.Data;
 using Buscador.Interfaces;
 using Buscador.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,51 +15,70 @@ namespace Buscador.Repositories
             _context = context;
         }
 
-        public async Task<List<SituacaoDto>> BuscarSituacoesRepAsync(string pesquisa)
+        public async Task<Situacao?> GetIdAsync(int id)
         {
-            IQueryable<Situacao> query = _context.Situacoes;
+            return await _context.Situacoes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<List<Situacao>> BuscarSituacoesAsync(string pesquisa)
+        {
+            var query = _context.Situacoes.AsNoTracking().Where(s => s.Ativo);
 
             if (!string.IsNullOrWhiteSpace(pesquisa))
             {
-                query = _context.Situacoes
+                query = query
                     .Where(s => s.ProblemaDescricao.Contains(pesquisa));
             }
 
-            var resultado = await query
-                .Select(s => new SituacaoDto
-            {
-                Id = s.Id,
-                ProblemaDescricao = s.ProblemaDescricao,
-                SolucaoDescricao = s.SolucaoDescricao,
-                DataRegistro = s.DataRegistro
-            }).ToListAsync();
-
-            return resultado;
+            return await query.ToListAsync();
         }
 
-        public async Task<List<SituacaoDto>> BuscarProblemaDescricaoAsync(string pesquisa)
+        public async Task<Situacao?> BuscarProblemaDescricaoAsync(string pesquisa)
         {
-            var resultado = _context.Situacoes
-                .Where(s => s.ProblemaDescricao == pesquisa)
-                .Select(s => new SituacaoDto
-                {
-                    Id = s.Id,
-                    ProblemaDescricao = s.ProblemaDescricao,
-                    SolucaoDescricao = s.SolucaoDescricao,
-                    DataRegistro = s.DataRegistro
-                });
-
-            return await resultado.ToListAsync();
+            return await _context.Situacoes
+               .AsNoTracking()
+               .FirstOrDefaultAsync(x => x.ProblemaDescricao == pesquisa);
         }
 
-        public async Task AddSituacaoAsync(Situacao situacao)
+        public async Task<Situacao?> ExisteProblemaDescricaoAsync(string pesquisa)
+        {
+            return await _context.Situacoes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ProblemaDescricao == pesquisa);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var query = await _context.Situacoes
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (query != null)
+            {
+                query.DesativaRegistro();
+                query.AtualizaDataRegistro();
+            }
+        }
+
+        public async Task<Situacao> AddSituacaoAsync(Situacao situacao)
         {
             await _context.Situacoes.AddAsync(situacao);
+
+            return situacao;
         }
 
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+        public Task<bool> ExistsAsync(int id)
+        {
+            IQueryable<Situacao> query = _context.Situacoes;
+
+            return query
+                .AnyAsync(s => s.Id == id);
         }
     }
 }

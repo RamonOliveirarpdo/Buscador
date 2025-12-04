@@ -1,11 +1,13 @@
 ﻿using Buscador.Dtos;
+using Buscador.Dtos.Requests;
 using Buscador.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Buscador.Controllers
 {
-    public class BuscadorController : Controller
+    [ApiController]
+    [Route("buscador")]
+    public class BuscadorController : ControllerBase
     {
         private readonly IBuscadorAplication _buscadorAplication;
 
@@ -14,71 +16,63 @@ namespace Buscador.Controllers
             _buscadorAplication = buscadorAplication;
         }
 
+        /// <summary>
+        /// Realiza a pesquisa de situação com base no id.
+        /// </summary>
         // GET: BuscadorController
-        [HttpGet("pesquisa Situacoes")]
-        public async Task<List<SituacaoDto>> BuscadorControllers(string pesquisa)
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(SituacaoDto), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetById(int id)
         {
-            var response = await _buscadorAplication.BuscarSituacoesAsync(pesquisa);
-            return response;
+            var response = await _buscadorAplication.BuscarSituacoesAsync(id);
+
+            return Ok(response);
         }
 
-        // POST: HomeController/Create
-        [HttpPost("Adiciona Situacoes")]
-        public async Task<List<SituacaoDto>> CriaSituacao(CriarSituacaoDto add)
+        /// <summary>
+        /// Realiza a pesquisa de uma lista de situações com base em um critério de busca.
+        /// </summary>
+        // GET: BuscadorController
+        [HttpGet("")]
+        [ProducesResponseType(typeof(IEnumerable<SituacaoDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> ListAll([FromQuery] string pesquisa)
         {
-            var response = new List<SituacaoDto>();
-            try
-            {
-                response = await _buscadorAplication.CriaSituacoesAsync(add);
+            var response = await _buscadorAplication.ListAllAsync(pesquisa);
 
-               return response;
-            }
-            catch (DbUpdateException ex)
-            {
-                return response;
-            }
+            return Ok(response);
         }
 
-        // GET: HomeController/Edit/5
-        public ActionResult Edit(int id)
+        /// <summary>
+        /// Adiciona situações.
+        /// </summary>
+        // POST: BuscadorController/Create
+        [HttpPost("")]
+        [ProducesResponseType(typeof(SituacaoDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> CriarSituacao([FromBody] CriarSituacaoRequest request)
         {
-            return View();
+            var response = await _buscadorAplication.CriaSituacoesAsync(request);
+
+            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
-        // POST: HomeController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        /// <summary>
+        /// Deleta situacoes pelo Id.
+        /// </summary>
+        /// DELETE: BuscadorController/Delete/5
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            await _buscadorAplication.DeleteSituacoesAsync(id);
 
-        // GET: HomeController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: HomeController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return NoContent();
         }
     }
 }
