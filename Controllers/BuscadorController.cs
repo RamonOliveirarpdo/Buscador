@@ -32,17 +32,19 @@ namespace Buscador.Controllers
         /// </summary>
         // POST: BuscadorController/Create
         [HttpPost("adiciona-situacoes")]
-        public async Task<IActionResult> CriarSituacao(CriarSituacaoDto add)
+        [ProducesResponseType(typeof(SituacaoDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> CriarSituacao([FromBody] CriarSituacaoDto add)
         {
             try
             {
                 var response = await _buscadorAplication.CriaSituacoesAsync(add);
 
-                return Ok(response);
+                return CreatedAtAction(nameof(CriarSituacao), response);
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                return StatusCode(500, "Erro interno do servidor.");
+                return Conflict(new { mensagem = ex.Message });
             }
         }
 
@@ -51,35 +53,26 @@ namespace Buscador.Controllers
         /// </summary>
         /// DELETE: BuscadorController/Delete/5
         [HttpDelete("situacoes/{id}")]
-        public async Task<HttpStatusCode> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var result = HttpStatusCode.NoContent;
             try
             {
-                result = await _buscadorAplication.DeleteSituacoesAsync(id);
+                var result = await _buscadorAplication.DeleteSituacoesAsync(id);
+
+                if(!await _buscadorAplication.DeleteSituacoesAsync(id))
+                {
+
+                    return NotFound();
+                }
+
+                return NoContent();
             }
             catch (Exception ex)
             {
 
-                throw ex.InnerException;
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new { mensagem = "Erro interno ao processar a requisição.", detalhe = ex.Message });
             }
-
-            return result;
         }
-        
-        //// POST: HomeController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }

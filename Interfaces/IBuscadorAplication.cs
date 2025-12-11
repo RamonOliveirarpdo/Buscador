@@ -10,6 +10,6 @@ namespace Buscador.Interfaces
 
         Task<SituacaoDto> CriaSituacoesAsync(CriarSituacaoDto add);
 
-        Task<HttpStatusCode> DeleteSituacoesAsync(int id);
+        Task<bool> DeleteSituacoesAsync(int id);
     }
 }

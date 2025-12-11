@@ -18,19 +18,19 @@ namespace Buscador.Repositories
             _context = context;
         }
 
-        public async Task<List<SituacaoDto>> BuscarSituacoesRepAsync(string pesquisa)
+        public async Task<List<Situacao>> BuscarSituacoesAsync(string pesquisa)
         {
             IQueryable<Situacao> query = _context.Situacoes;
 
             if (!string.IsNullOrWhiteSpace(pesquisa))
             {
-                query = _context.Situacoes
+                query = query
                     .Where(s => s.ProblemaDescricao.Contains(pesquisa));
             }
 
             var resultado = await query
                 .Where(s => s.Ativo == true)
-                .Select(s => new SituacaoDto
+                .Select(s => new Situacao
             {
                 Id = s.Id,
                 ProblemaDescricao = s.ProblemaDescricao,
@@ -41,14 +41,14 @@ namespace Buscador.Repositories
             return resultado;
         }
 
-        public async Task<SituacaoDto?> BuscarProblemaDescricaoAsync(string pesquisa)
+        public async Task<Situacao> BuscarProblemaDescricaoAsync(string pesquisa)
         {
             IQueryable<Situacao> query = _context.Situacoes;
 
             query = query.Where(x => x.ProblemaDescricao == pesquisa);
 
             var resultado = await query
-               .Select(s => new SituacaoDto
+               .Select(s => new Situacao
                {
                    Id = s.Id,
                    ProblemaDescricao = s.ProblemaDescricao,
@@ -59,12 +59,21 @@ namespace Buscador.Repositories
             return resultado;
         }
 
-        public async Task<bool> ExisteProblemaDescricaoAsync(string pesquisa)
+        public async Task<Situacao> ExisteProblemaDescricaoAsync(string pesquisa)
         {
-            var data = await _context.Situacoes
-                .AnyAsync(s => s.ProblemaDescricao == pesquisa);
+            var query =  _context.Situacoes
+                .Where(s => s.ProblemaDescricao == pesquisa);
 
-            return data;
+            var resultado = await query
+                .Select(s => new Situacao
+                {
+                    Id = s.Id,
+                    ProblemaDescricao = s.ProblemaDescricao,
+                    SolucaoDescricao = s.SolucaoDescricao,
+                    DataRegistro = s.DataRegistro,
+                }).FirstOrDefaultAsync();
+
+            return resultado;
         }
 
         public async Task<bool> GetIdAsync(int id)
@@ -77,20 +86,21 @@ namespace Buscador.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var data = await _context.Situacoes
+            var query = await _context.Situacoes
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (data != null)
+            if (query != null)
             {
-                data.DesativaRegistro();
-                data.AtualizaDataRegistro();
-                await _context.SaveChangesAsync();
+                query.DesativaRegistro();
+                query.AtualizaDataRegistro();
             }
         }
 
-        public async Task AddSituacaoAsync(Situacao situacao)
+        public async Task<Situacao> AddSituacaoAsync(Situacao situacao)
         {
             await _context.Situacoes.AddAsync(situacao);
+
+            return situacao;
         }
 
         public async Task<int> SaveChangesAsync()

@@ -1,7 +1,7 @@
 ﻿using Buscador.Dtos;
 using Buscador.Interfaces;
 using Buscador.Models;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace Buscador.Aplications
@@ -17,18 +17,21 @@ namespace Buscador.Aplications
 
         public async Task<List<SituacaoDto>> BuscarSituacoesAsync(string pesquisa)
         {
-            var busca = await _buscadorRepository.BuscarSituacoesRepAsync(pesquisa);
-            return busca;
+
+            var situacaoList = await _buscadorRepository.BuscarSituacoesAsync(pesquisa);
+            var SituacaoDtoList = ReturnSituacaoDto(situacaoList);
+
+            return SituacaoDtoList;
         }
 
         public async Task<SituacaoDto> CriaSituacoesAsync(CriarSituacaoDto add)
         {
-            bool existingSituacoes = await _buscadorRepository.ExisteProblemaDescricaoAsync(add.ProblemaDescricao);
-            if (existingSituacoes == true)
-            {
-                var responseExiste = await _buscadorRepository.BuscarProblemaDescricaoAsync(add.ProblemaDescricao);
 
-                return responseExiste;  
+            var existingSituacoes = await _buscadorRepository.ExisteProblemaDescricaoAsync(add.ProblemaDescricao);
+
+            if (existingSituacoes != null)
+            {
+                throw new InvalidOperationException("A situação já está cadastrada no sistema. Não é possível duplicar.");
             }
 
             var situacao = new Situacao
@@ -40,26 +43,49 @@ namespace Buscador.Aplications
                 DataAtualizacao = DateTime.UtcNow
             };
 
-             await _buscadorRepository.AddSituacaoAsync(situacao);
-             await _buscadorRepository.SaveChangesAsync();
+             var situacaoSalva = await _buscadorRepository.AddSituacaoAsync(situacao);
+             var situacaoDto = ReturnSituacaoDto(situacaoSalva);
+            await _buscadorRepository.SaveChangesAsync();
 
-            var response = await _buscadorRepository.BuscarProblemaDescricaoAsync(situacao.ProblemaDescricao);
-
-            return response;
+            return situacaoDto;
         }
 
-        public async Task<HttpStatusCode> DeleteSituacoesAsync(int id)
+        public async Task<bool> DeleteSituacoesAsync(int id)
         {
-            bool existingSituacoes = await _buscadorRepository.GetIdAsync(id);
-            if (existingSituacoes == false)
-            {
 
-                return HttpStatusCode.NotFound;
+            if (!await _buscadorRepository.GetIdAsync(id))
+            {
+                return false;
             }
 
             await _buscadorRepository.DeleteAsync(id);
+            await _buscadorRepository.SaveChangesAsync();
 
-            return HttpStatusCode.OK;
+            return true;
+        }
+
+        private SituacaoDto ReturnSituacaoDto(Situacao situacao)
+        {
+
+            return new SituacaoDto
+            {
+                Id = situacao.Id,
+                ProblemaDescricao = situacao.ProblemaDescricao,
+                SolucaoDescricao = situacao.SolucaoDescricao,
+                DataRegistro = situacao.DataRegistro
+            };
+        }
+
+        private List<SituacaoDto> ReturnSituacaoDto(List<Situacao> situacaoList)
+        {
+
+            return situacaoList.Select(situacao => new SituacaoDto
+            {
+                Id = situacao.Id,
+                ProblemaDescricao = situacao.ProblemaDescricao,
+                SolucaoDescricao = situacao.SolucaoDescricao,
+                DataRegistro = situacao.DataRegistro
+            }).ToList();
         }
     }
 }

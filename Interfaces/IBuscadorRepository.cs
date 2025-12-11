@@ -5,17 +5,17 @@ namespace Buscador.Interfaces
 {
     public interface IBuscadorRepository
     {
-        Task<List<SituacaoDto>> BuscarSituacoesRepAsync(string pesquisa);
+        Task<List<Situacao>> BuscarSituacoesAsync(string pesquisa);
 
-        Task<SituacaoDto> BuscarProblemaDescricaoAsync(string pesquisa);
+        Task<Situacao> BuscarProblemaDescricaoAsync(string pesquisa);
 
         Task<bool> GetIdAsync(int id);
 
         Task DeleteAsync(int id);
 
-        Task<bool> ExisteProblemaDescricaoAsync(string pesquisa);
+        Task<Situacao> ExisteProblemaDescricaoAsync(string pesquisa);
 
-        Task AddSituacaoAsync(Situacao situacao);
+        Task<Situacao> AddSituacaoAsync(Situacao situacao);
 
         Task<int> SaveChangesAsync();
     }
