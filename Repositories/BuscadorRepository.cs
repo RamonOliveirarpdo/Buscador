@@ -66,6 +66,26 @@ namespace Buscador.Repositories
             return data;
         }
 
+        public async Task<bool> GetIdAsync(int id)
+        {
+            var data = await _context.Situacoes
+                .AnyAsync(s => s.Id == id);
+
+            return data;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var data = await _context.Situacoes
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (data != null)
+            {
+                _context.Situacoes.Remove(data);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task AddSituacaoAsync(Situacao situacao)
         {
             await _context.Situacoes.AddAsync(situacao);

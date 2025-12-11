@@ -9,6 +9,10 @@ namespace Buscador.Interfaces
 
         Task<SituacaoDto> BuscarProblemaDescricaoAsync(string pesquisa);
 
+        Task<bool> GetIdAsync(int id);
+
+        Task DeleteAsync(int id);
+
         Task<bool> ExisteProblemaDescricaoAsync(string pesquisa);
 
         Task AddSituacaoAsync(Situacao situacao);

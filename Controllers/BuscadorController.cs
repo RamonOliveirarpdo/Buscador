@@ -2,6 +2,7 @@
 using Buscador.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Buscador.Controllers
 {
@@ -33,10 +34,9 @@ namespace Buscador.Controllers
         [HttpPost("adiciona-situacoes")]
         public async Task<IActionResult> CriarSituacao(CriarSituacaoDto add)
         {
-            var response = new SituacaoDto();
             try
             {
-                response =  await _buscadorAplication.CriaSituacoesAsync(add);
+                var response =  await _buscadorAplication.CriaSituacoesAsync(add);
 
                 return Ok(response);
             }
@@ -45,34 +45,27 @@ namespace Buscador.Controllers
                 return StatusCode(500, "Erro interno do servidor.");
             }
         }
+        /// <summary>
+        /// Deleta situaxcoes pelo Id.
+        /// </summary>
+        /// DELETE: BuscadorController/Delete/5
+        [HttpDelete("situacoes/{id}")]
+        public async Task<HttpStatusCode> Delete(int id)
+        {
+            var result = HttpStatusCode.NoContent;
+            try
+            {
+                result = await _buscadorAplication.DeleteSituacoesAsync(id);
+            }
+            catch (Exception ex)
+            {
 
-        //// GET: HomeController/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-        //
-        //// POST: HomeController/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-        //
-        //// GET: HomeController/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-        //
+                throw ex.InnerException;
+            }
+
+            return result;
+        }
+        
         //// POST: HomeController/Delete/5
         //[HttpPost]
         //[ValidateAntiForgeryToken]

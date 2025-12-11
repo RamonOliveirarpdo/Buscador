@@ -1,5 +1,6 @@
 ﻿using Buscador.Dtos;
 using Buscador.Models;
+using System.Net;
 
 namespace Buscador.Interfaces
 {
@@ -8,5 +9,7 @@ namespace Buscador.Interfaces
         Task<List<SituacaoDto>> BuscarSituacoesAsync(string pesquisa);
 
         Task<SituacaoDto> CriaSituacoesAsync(CriarSituacaoDto add);
+
+        Task<HttpStatusCode> DeleteSituacoesAsync(int id);
     }
 }

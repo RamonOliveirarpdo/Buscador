@@ -1,6 +1,8 @@
 ﻿using Buscador.Dtos;
 using Buscador.Interfaces;
 using Buscador.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Buscador.Aplications
 {
@@ -42,6 +44,20 @@ namespace Buscador.Aplications
             var response = await _buscadorRepository.BuscarProblemaDescricaoAsync(situacao.ProblemaDescricao);
 
             return response;
+        }
+
+        public async Task<HttpStatusCode> DeleteSituacoesAsync(int id)
+        {
+            bool existingSituacoes = await _buscadorRepository.GetIdAsync(id);
+            if (existingSituacoes == false)
+            {
+
+                return HttpStatusCode.NotFound;
+            }
+
+            await _buscadorRepository.DeleteAsync(id);
+
+            return HttpStatusCode.OK;
         }
     }
 }
