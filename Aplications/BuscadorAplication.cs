@@ -35,7 +35,9 @@ namespace Buscador.Aplications
             {
                 ProblemaDescricao = add.ProblemaDescricao,
                 SolucaoDescricao = add.SolucaoDescricao,
-                DataRegistro = DateTime.UtcNow
+                DataRegistro = DateTime.UtcNow,
+                Ativo = true,
+                DataAtualizacao = DateTime.UtcNow
             };
 
              await _buscadorRepository.AddSituacaoAsync(situacao);

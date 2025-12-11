@@ -29,6 +29,7 @@ namespace Buscador.Repositories
             }
 
             var resultado = await query
+                .Where(s => s.Ativo == true)
                 .Select(s => new SituacaoDto
             {
                 Id = s.Id,
@@ -52,7 +53,7 @@ namespace Buscador.Repositories
                    Id = s.Id,
                    ProblemaDescricao = s.ProblemaDescricao,
                    SolucaoDescricao = s.SolucaoDescricao,
-                   DataRegistro = s.DataRegistro
+                   DataRegistro = s.DataRegistro,
                }).FirstOrDefaultAsync();
 
             return resultado;
@@ -81,7 +82,8 @@ namespace Buscador.Repositories
 
             if (data != null)
             {
-                _context.Situacoes.Remove(data);
+                data.DesativaRegistro();
+                data.AtualizaDataRegistro();
                 await _context.SaveChangesAsync();
             }
         }

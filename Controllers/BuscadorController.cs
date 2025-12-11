@@ -36,7 +36,7 @@ namespace Buscador.Controllers
         {
             try
             {
-                var response =  await _buscadorAplication.CriaSituacoesAsync(add);
+                var response = await _buscadorAplication.CriaSituacoesAsync(add);
 
                 return Ok(response);
             }
@@ -45,6 +45,7 @@ namespace Buscador.Controllers
                 return StatusCode(500, "Erro interno do servidor.");
             }
         }
+
         /// <summary>
         /// Deleta situaxcoes pelo Id.
         /// </summary>
