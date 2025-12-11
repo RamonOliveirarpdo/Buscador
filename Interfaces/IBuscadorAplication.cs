@@ -7,6 +7,6 @@ namespace Buscador.Interfaces
     {
         Task<List<SituacaoDto>> BuscarSituacoesAsync(string pesquisa);
 
-        Task<List<SituacaoDto>> CriaSituacoesAsync(CriarSituacaoDto add);
+        Task<SituacaoDto> CriaSituacoesAsync(CriarSituacaoDto add);
     }
 }

@@ -19,12 +19,14 @@ namespace Buscador.Aplications
             return busca;
         }
 
-        public async Task<List<SituacaoDto>> CriaSituacoesAsync(CriarSituacaoDto add)
+        public async Task<SituacaoDto> CriaSituacoesAsync(CriarSituacaoDto add)
         {
-            var existingSituacoes = await _buscadorRepository.BuscarProblemaDescricaoAsync(add.ProblemaDescricao);
-            if (existingSituacoes.Count() > 0)
+            bool existingSituacoes = await _buscadorRepository.ExisteProblemaDescricaoAsync(add.ProblemaDescricao);
+            if (existingSituacoes == true)
             {
-                return existingSituacoes;  
+                var responseExiste = await _buscadorRepository.BuscarProblemaDescricaoAsync(add.ProblemaDescricao);
+
+                return responseExiste;  
             }
 
             var situacao = new Situacao
@@ -34,7 +36,7 @@ namespace Buscador.Aplications
                 DataRegistro = DateTime.UtcNow
             };
 
-            await _buscadorRepository.AddSituacaoAsync(situacao);
+             await _buscadorRepository.AddSituacaoAsync(situacao);
              await _buscadorRepository.SaveChangesAsync();
 
             var response = await _buscadorRepository.BuscarProblemaDescricaoAsync(situacao.ProblemaDescricao);

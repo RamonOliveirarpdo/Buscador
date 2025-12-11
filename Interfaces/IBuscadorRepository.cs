@@ -7,7 +7,9 @@ namespace Buscador.Interfaces
     {
         Task<List<SituacaoDto>> BuscarSituacoesRepAsync(string pesquisa);
 
-        Task<List<SituacaoDto>> BuscarProblemaDescricaoAsync(string pesquisa);
+        Task<SituacaoDto> BuscarProblemaDescricaoAsync(string pesquisa);
+
+        Task<bool> ExisteProblemaDescricaoAsync(string pesquisa);
 
         Task AddSituacaoAsync(Situacao situacao);
 

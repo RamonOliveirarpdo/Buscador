@@ -22,6 +22,7 @@ namespace Buscador.Controllers
         public async Task<List<SituacaoDto>> BuscarSituacoes(string pesquisa)
         {
             var response = await _buscadorAplication.BuscarSituacoesAsync(pesquisa);
+            
             return response;
         }
 
@@ -30,18 +31,18 @@ namespace Buscador.Controllers
         /// </summary>
         // POST: BuscadorController/Create
         [HttpPost("adiciona-situacoes")]
-        public async Task<List<SituacaoDto>> CriarSituacao(CriarSituacaoDto add)
+        public async Task<IActionResult> CriarSituacao(CriarSituacaoDto add)
         {
-            var response = new List<SituacaoDto>();
+            var response = new SituacaoDto();
             try
             {
-                response = await _buscadorAplication.CriaSituacoesAsync(add);
+                response =  await _buscadorAplication.CriaSituacoesAsync(add);
 
-               return response;
+                return Ok(response);
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
-                return response;
+                return StatusCode(500, "Erro interno do servidor.");
             }
         }
 

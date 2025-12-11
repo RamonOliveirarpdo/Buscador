@@ -2,7 +2,9 @@
 using Buscador.Infrastructure.Data;
 using Buscador.Interfaces;
 using Buscador.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Buscador.Repositories
@@ -38,19 +40,30 @@ namespace Buscador.Repositories
             return resultado;
         }
 
-        public async Task<List<SituacaoDto>> BuscarProblemaDescricaoAsync(string pesquisa)
+        public async Task<SituacaoDto?> BuscarProblemaDescricaoAsync(string pesquisa)
         {
-            var resultado = _context.Situacoes
-                .Where(s => s.ProblemaDescricao == pesquisa)
-                .Select(s => new SituacaoDto
-                {
-                    Id = s.Id,
-                    ProblemaDescricao = s.ProblemaDescricao,
-                    SolucaoDescricao = s.SolucaoDescricao,
-                    DataRegistro = s.DataRegistro
-                });
+            IQueryable<Situacao> query = _context.Situacoes;
 
-            return await resultado.ToListAsync();
+            query = query.Where(x => x.ProblemaDescricao == pesquisa);
+
+            var resultado = await query
+               .Select(s => new SituacaoDto
+               {
+                   Id = s.Id,
+                   ProblemaDescricao = s.ProblemaDescricao,
+                   SolucaoDescricao = s.SolucaoDescricao,
+                   DataRegistro = s.DataRegistro
+               }).FirstOrDefaultAsync();
+
+            return resultado;
+        }
+
+        public async Task<bool> ExisteProblemaDescricaoAsync(string pesquisa)
+        {
+            var data = await _context.Situacoes
+                .AnyAsync(s => s.ProblemaDescricao == pesquisa);
+
+            return data;
         }
 
         public async Task AddSituacaoAsync(Situacao situacao)
