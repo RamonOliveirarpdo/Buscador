@@ -26,6 +26,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBuscadorAplication, BuscadorAplication>();
 builder.Services.AddScoped<IBuscadorRepository, BuscadorRepository>();
+builder.Services.AddScoped<IUserAplication, UserAplication>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 var app = builder.Build();
 
