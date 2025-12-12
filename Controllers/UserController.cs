@@ -19,18 +19,24 @@ namespace Buscador.Controllers
         /// </summary>
         // GET: UserController
         [HttpGet("pesquisa-usuarios")]
-        public async Task<UserDto> GetId(int userId)
+        public async Task<UserResponse> GetId(int userId)
         {
             var user = await _userAplication.GetUserNameAsync(userId);
 
             return user;
         }
 
-        //// GET: UserController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
+        /// <summary>
+        /// Realiza a criação de usuario.
+        /// </summary>
+        // POST: UserController/Details/5
+        [HttpPost("cria-usuarios")]
+        public async Task<UserResponse> CreateUser(UserRequest user)
+        {
+            var data = await _userAplication.CreateUserAsync(user);
+
+            return data;
+        }
         
         //// GET: UserController/Create
         //public ActionResult Create()

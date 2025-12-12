@@ -1,7 +1,10 @@
 using Buscador.Aplications;
+using Buscador.Core.Interfaces;
+using Buscador.Core.Settings;
 using Buscador.Infrastructure.Data;
 using Buscador.Interfaces;
 using Buscador.Repositories;
+using Buscador.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -20,6 +23,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
+builder.Services.AddSingleton<IHashService, HashService>();
+
+builder.Services.Configure<SecuritySettings>(
+    builder.Configuration.GetSection("SecuritySettings"));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +35,7 @@ builder.Services.AddScoped<IBuscadorAplication, BuscadorAplication>();
 builder.Services.AddScoped<IBuscadorRepository, BuscadorRepository>();
 builder.Services.AddScoped<IUserAplication, UserAplication>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IHashService, HashService>();
 
 
 var app = builder.Build();

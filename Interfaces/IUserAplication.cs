@@ -4,6 +4,8 @@ namespace Buscador.Interfaces
 {
     public interface IUserAplication
     {
-        Task<UserDto> GetUserNameAsync(int userId);
+        Task<UserResponse> GetUserNameAsync(int userId);
+
+        Task<UserResponse> CreateUserAsync(UserRequest user);
     }
 }
