@@ -14,20 +14,6 @@ namespace Buscador.Repositories
             _context = context;
         }
 
-        public async Task<User> CreateUserAsync(UserRequest User)
-        {
-            var resultado = new User
-            {
-                UserName = User.UserName,
-                Email = User.Email,
-                Password = User.Password,
-                CreatedAt = User.CreatedAt,
-                IsActive = User.IsActive
-            };
-
-            return resultado;
-        }
-
         public async Task<User> GetUserByIdAsync(int userId)
         {
             IQueryable<User> query = _context.Users;
@@ -55,8 +41,7 @@ namespace Buscador.Repositories
 
         public async Task<int> SaveChangesAsync()
         {
-            var response = await _context.SaveChangesAsync();
-            return response;
+            return await _context.SaveChangesAsync();
         }
     }
 }

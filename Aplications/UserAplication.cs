@@ -2,8 +2,6 @@
 using Buscador.Dtos;
 using Buscador.Interfaces;
 using Buscador.Models;
-using Buscador.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Buscador.Aplications
 {
@@ -26,65 +24,26 @@ namespace Buscador.Aplications
             }
 
             var data = await _userRepository.GetUserByIdAsync(userId);
-
-            var userResponse = new UserResponse
-            {
-                Id = data.Id,
-                UserName = data.UserName,
-                Email = data.Email,
-                Password = data.Password,
-                EmailConfirmed = data.EmailConfirmed,
-                PasswordValid = data.PasswordValid,
-                CreatedAt = data.CreatedAt,
-                IsAdmin = data.IsAdmin,
-                IsActive = data.IsActive
-            };
+            var userResponse = CriaUserResponse(data);
 
             return userResponse;
         }
 
-        public async Task<UserResponse> CreateUserAsync(UserRequest userDto)
+        public async Task<UserResponse> CreateUserAsync(UserRequest userRequest)
         {
-            var data = await _userRepository.CreateUserAsync(userDto);
+            var data = CriaUser(userRequest);
+            data = await _userRepository.AddUserAsync(data);
 
-            var user = new User
-            {
-                Id = data.Id,
-                UserName = data.UserName,
-                Email = data.Email,
-                Password = _hashService.HashPassword(data.Password),
-                EmailConfirmed = data.EmailConfirmed,
-                PasswordValid = data.PasswordValid,
-                CreatedAt = data.CreatedAt,
-                IsAdmin = data.IsAdmin,
-                IsActive = data.IsActive
-            };
+            int recordsAffected = await _userRepository.SaveChangesAsync();
 
-            user = await _userRepository.AddUserAsync(user);
-            int linhasAfetadas = await _userRepository.SaveChangesAsync();
-            if (linhasAfetadas == 0)
+            if (recordsAffected == 0)
             {
                 throw new Exception("Falha ao persistir a nova situação no banco de dados.");
             }
-            var userDtoResponse = CriaUserDto(user);
-            var userResponse = CriaUserResponse(userDtoResponse);
+
+            var userResponse = CriaUserResponse(data);
 
             return userResponse;
-        }
-
-        public UserDto CriaUserDto(User user)
-        {
-            var userDto = new UserDto
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                Password = _hashService.HashPassword(user.Password),
-                CreatedAt = user.CreatedAt,
-                IsAdmin = user.IsAdmin,
-                IsActive = user.IsActive
-            };
-
-            return userDto;
         }
 
         public User CriaUser(UserRequest userDto)
@@ -94,23 +53,25 @@ namespace Buscador.Aplications
                 UserName = userDto.UserName,
                 Email = userDto.Email,
                 Password = _hashService.HashPassword(userDto.Password),
-                CreatedAt = userDto.CreatedAt,
-                IsActive = userDto.IsActive
+                CreatedAt = DateTime.UtcNow,
+                IsAdmin = false,
+                IsActive = true
             };
 
             return user;
         }
 
-        public UserResponse CriaUserResponse(UserDto userDto)
+        public UserResponse CriaUserResponse(User user)
         {
             var userResponse = new UserResponse
             {
-                UserName = userDto.UserName,
-                Email = userDto.Email,
-                Password = _hashService.HashPassword(userDto.Password),
-                CreatedAt = userDto.CreatedAt,
-                IsAdmin = userDto.IsAdmin,
-                IsActive = userDto.IsActive
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Password = _hashService.HashPassword(user.Password),
+                CreatedAt = user.CreatedAt,
+                IsAdmin = user.IsAdmin,
+                IsActive = user.IsActive
             };
 
             return userResponse;
